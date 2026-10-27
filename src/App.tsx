@@ -19,17 +19,32 @@ const CATEGORIES = [
   { id: 'others', label: 'Others', icon: MoreHorizontal },
 ];
 
+// Reusable Neumorphic Shadow Tokens for #1c1e24 matte dark surface
+const NEU_RAISED =
+  'bg-[#1c1e24] shadow-[8px_8px_16px_#121317,-8px_-8px_16px_#262931] border border-white/[0.03]';
+const NEU_RAISED_SM =
+  'bg-[#1c1e24] shadow-[5px_5px_10px_#121317,-5px_-5px_10px_#262931] border border-white/[0.03]';
+const NEU_INSET =
+  'bg-[#181a1f] shadow-[inset_5px_5px_10px_#111216,inset_-5px_-5px_10px_#252830] border border-black/20';
+const NEU_INSET_SM =
+  'bg-[#181a1f] shadow-[inset_3px_3px_6px_#111216,inset_-3px_-3px_6px_#252830]';
+const NEU_BTN_INTERACTIVE =
+  'bg-[#1c1e24] shadow-[5px_5px_10px_#121317,-5px_-5px_10px_#262931] hover:shadow-[3px_3px_6px_#121317,-3px_-3px_6px_#262931] active:shadow-[inset_4px_4px_8px_#121317,inset_-4px_-4px_8px_#262931] border border-white/[0.03] transition-all duration-200';
+
 export default function App() {
-  // New State: Language Toggle
+  // Navigation & Language State
+  const [activeNav, setActiveNav] = useState('Home');
   const [lang, setLang] = useState('EN');
-  
+
   // Interactive Notebook State
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [direction, setDirection] = useState(1); // 1 for next, -1 for back
   const [selectedCategory, setSelectedCategory] = useState('Roads & Transport');
   const [location, setLocation] = useState('Sector 17, Near City Park, Bhopal, MP');
-  const [description, setDescription] = useState('Large pothole on the main road causing difficulty for vehicles.');
+  const [description, setDescription] = useState(
+    'Large pothole on the main road causing difficulty for vehicles.'
+  );
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const openNotebookWithCategory = (catLabel?: string) => {
@@ -53,336 +68,359 @@ export default function App() {
   const pageVariants = {
     enter: (dir: number) => ({ x: dir > 0 ? 30 : -30, opacity: 0 }),
     center: { x: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
-    exit: (dir: number) => ({ x: dir < 0 ? 30 : -30, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } })
+    exit: (dir: number) => ({ x: dir < 0 ? 30 : -30, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }),
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#1e1b18] text-white flex p-5 gap-6 select-none">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#1c1e24] text-slate-100 flex p-6 gap-7 select-none">
       
-      {/* WARM SUNLIT WOOD DESK BACKGROUND */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-1000"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2400&auto=format&fit=crop')`,
-          filter: 'brightness(0.65) contrast(1.08) saturate(0.95)'
-        }}
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_35%,rgba(255,228,181,0.22),transparent_60%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/65 via-black/20 to-amber-950/30 pointer-events-none" />
-
-      {/* ==================== LEFT SIDEBAR ==================== */}
-      <aside className="relative z-10 w-[230px] shrink-0 h-full flex flex-col justify-between rounded-[28px] bg-black/25 backdrop-blur-2xl border border-white/15 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+      {/* ==================== LEFT NEUMORPHIC SIDEBAR ==================== */}
+      <aside className={`relative z-10 w-[235px] shrink-0 h-full flex flex-col justify-between rounded-[30px] p-6 ${NEU_RAISED}`}>
         <div>
-          <div className="flex items-center gap-3.5 px-2 pt-1 mb-9">
-            <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shadow-inner">
-              <BookOpen size={20} className="text-amber-100" />
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3.5 px-1 pt-1 mb-10">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-rose-300 ${NEU_INSET_SM}`}>
+              <BookOpen size={20} />
             </div>
             <div className="font-serif-display leading-tight">
-              <span className="block text-lg font-semibold tracking-wide text-white">Call for</span>
-              <span className="block text-lg font-semibold tracking-wide text-white/90">Resolve</span>
+              <span className="block text-lg font-semibold tracking-wide text-slate-100">Call for</span>
+              <span className="block text-lg font-semibold tracking-wide text-rose-300/90">Resolve</span>
             </div>
           </div>
 
-          <nav className="flex flex-col gap-1.5">
+          {/* Tactile Navigation Items */}
+          <nav className="flex flex-col gap-3">
             {[
-              { icon: Home, label: 'Home', active: true },
+              { icon: Home, label: 'Home' },
               { icon: FileText, label: 'My Reports' },
               { icon: Rss, label: 'City Feed' },
               { icon: MapIcon, label: 'Map View' },
               { icon: Settings, label: 'Settings' },
-            ].map((item, idx) => (
-              <button
-                key={idx}
-                className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm transition-all duration-200 cursor-pointer ${
-                  item.active
-                    ? 'bg-gradient-to-r from-indigo-500/35 to-purple-500/20 border border-indigo-300/30 text-white font-medium shadow-[0_0_25px_rgba(99,102,241,0.25)]'
-                    : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent'
-                }`}
-              >
-                <item.icon size={18} className={item.active ? 'text-indigo-200' : 'text-white/60'} />
-                <span>{item.label}</span>
-              </button>
-            ))}
+            ].map((item) => {
+              const isActive = activeNav === item.label;
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => setActiveNav(item.label)}
+                  className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-medium transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? `${NEU_INSET_SM} text-rose-300`
+                      : 'text-slate-400 hover:text-slate-200 shadow-[4px_4px_8px_#14151a,-4px_-4px_8px_#24272e] hover:shadow-[2px_2px_5px_#14151a,-2px_-2px_5px_#24272e]'
+                  }`}
+                >
+                  <item.icon size={18} className={isActive ? 'text-rose-400' : 'text-slate-400'} />
+                  <span>{item.label}</span>
+                  {isActive && (
+                    <span className="ml-auto w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]" />
+                  )}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-white/10">
-          <button className="w-full flex items-center justify-between p-2 rounded-2xl hover:bg-white/10 transition-colors cursor-pointer">
+        {/* User Profile Footer */}
+        <div className="pt-4">
+          <button className={`w-full flex items-center justify-between p-3 rounded-2xl cursor-pointer ${NEU_BTN_INTERACTIVE}`}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-white/30 flex items-center justify-center font-serif-display text-base font-semibold shadow-md">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-serif-display text-base font-semibold text-rose-300 ${NEU_INSET_SM}`}>
                 A
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-white leading-tight">Akshat</p>
-                <p className="text-xs text-white/55">Citizen</p>
+                <p className="text-sm font-semibold text-slate-100 leading-tight">Akshat</p>
+                <p className="text-xs text-slate-400">Citizen</p>
               </div>
             </div>
-            <ChevronRight size={16} className="text-white/40" />
+            <ChevronRight size={16} className="text-slate-500" />
           </button>
         </div>
       </aside>
 
       {/* ==================== RIGHT WORKSPACE ==================== */}
-      <div className="relative z-10 flex-1 h-full flex flex-col justify-between gap-4 min-w-0">
+      <div className="relative z-10 flex-1 h-full flex flex-col justify-between gap-5 min-w-0">
         
         {/* TOP BAR */}
         <header className="flex items-center justify-between w-full shrink-0">
           <div className="w-32" />
 
-          <div className="relative w-[460px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60" size={17} />
+          {/* Recessed Neumorphic Search Bar */}
+          <div className="relative w-[480px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
             <input
               type="text"
               placeholder="Search issues, locations or keywords..."
-              className="w-full bg-white/12 backdrop-blur-2xl border border-white/20 rounded-full py-2.5 pl-11 pr-20 text-sm text-white placeholder-white/55 shadow-lg focus:outline-none focus:border-white/40 transition-all"
+              className={`w-full rounded-full py-3 pl-12 pr-24 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-rose-400/30 transition-all ${NEU_INSET}`}
             />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-white/60">
-              <kbd className="bg-black/30 border border-white/15 px-1.5 py-0.5 rounded text-[10px] font-medium">Ctrl</kbd>
-              <kbd className="bg-black/30 border border-white/15 px-1.5 py-0.5 rounded text-[10px] font-medium">K</kbd>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-slate-400">
+              <kbd className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${NEU_RAISED_SM}`}>Ctrl</kbd>
+              <kbd className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${NEU_RAISED_SM}`}>K</kbd>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-3.5">
             {/* Language Toggle Button */}
-            <button 
+            <button
               onClick={() => setLang(lang === 'EN' ? 'HI' : 'EN')}
-              className="px-3.5 h-10 rounded-full bg-black/25 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition cursor-pointer text-xs font-semibold gap-1.5"
+              className={`px-4 h-11 rounded-full flex items-center justify-center text-slate-300 hover:text-rose-300 cursor-pointer text-xs font-semibold gap-1.5 ${NEU_BTN_INTERACTIVE}`}
             >
-              <Globe size={14} />
+              <Globe size={14} className="text-rose-400" />
               {lang}
             </button>
 
-            <button className="w-10 h-10 rounded-full bg-black/25 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition cursor-pointer">
+            <button className={`w-11 h-11 rounded-full flex items-center justify-center text-slate-300 hover:text-amber-300 cursor-pointer ${NEU_BTN_INTERACTIVE}`}>
               <Sun size={18} />
             </button>
-            <button className="w-10 h-10 rounded-full bg-black/25 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition relative cursor-pointer">
+
+            <button className={`w-11 h-11 rounded-full flex items-center justify-center text-slate-300 hover:text-rose-300 relative cursor-pointer ${NEU_BTN_INTERACTIVE}`}>
               <Bell size={18} />
-              <span className="absolute -top-1 -right-0.5 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow">
+              <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(244,63,94,0.8)]">
                 3
               </span>
             </button>
-            <button className="w-10 h-10 rounded-full bg-black/25 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition cursor-pointer">
+
+            <button className={`w-11 h-11 rounded-full flex items-center justify-center text-slate-300 hover:text-rose-300 cursor-pointer ${NEU_BTN_INTERACTIVE}`}>
               <MessageSquare size={17} />
             </button>
           </div>
         </header>
 
         {/* CENTER 3-COLUMN GRID */}
-        {/* FIX: min-h-0 prevents flex children from overflowing the parent container */}
-        <div className="flex-1 grid grid-cols-12 gap-6 items-center min-h-0 relative z-10">
+        <div className="flex-1 grid grid-cols-12 gap-7 items-center min-h-0 relative z-10">
           
-          {/* COLUMN 1: Greeting & Stats */}
-          <div className="col-span-4 flex flex-col justify-center pl-2">
-            <p className="text-xs tracking-[0.25em] uppercase text-white/75 font-medium mb-1">
+          {/* COLUMN 1: Greeting & Extruded Stats Cards */}
+          <div className="col-span-4 flex flex-col justify-center pl-1">
+            <p className="text-xs tracking-[0.25em] uppercase text-rose-300/80 font-semibold mb-1">
               Good Evening,
             </p>
-            <h1 className="font-serif-display text-6xl font-medium tracking-tight text-white mb-2 drop-shadow-sm">
+            <h1 className="font-serif-display text-6xl font-medium tracking-tight text-slate-100 mb-2">
               Akshat
             </h1>
-            <p className="text-white/80 text-base mb-6">
+            <p className="text-slate-400 text-base mb-6">
               A cleaner city, a brighter tomorrow.
             </p>
 
-            <div className="grid grid-cols-2 gap-3.5 mb-5">
-              <div className="bg-white/12 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition cursor-pointer group shadow-lg">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="w-9 h-9 rounded-full bg-blue-500/25 border border-blue-400/40 flex items-center justify-center text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+            {/* 2x2 Neumorphic Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {/* Submitted */}
+              <div className={`rounded-2xl p-4 cursor-pointer group ${NEU_BTN_INTERACTIVE}`}>
+                <div className="flex justify-between items-start mb-2.5">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sky-400 ${NEU_INSET_SM}`}>
                     <FileText size={17} />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">3</span>
-                    <ChevronRight size={14} className="text-white/40 group-hover:translate-x-0.5 transition" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-2xl font-bold text-slate-100">3</span>
+                    <ChevronRight size={14} className="text-slate-500 group-hover:translate-x-0.5 transition" />
                   </div>
                 </div>
-                <p className="text-xs text-white/70 font-medium">Submitted</p>
+                <p className="text-xs text-slate-400 font-medium">Submitted</p>
               </div>
 
-              <div className="bg-white/12 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition cursor-pointer group shadow-lg">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="w-9 h-9 rounded-full bg-amber-500/25 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+              {/* In Progress */}
+              <div className={`rounded-2xl p-4 cursor-pointer group ${NEU_BTN_INTERACTIVE}`}>
+                <div className="flex justify-between items-start mb-2.5">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-amber-400 ${NEU_INSET_SM}`}>
                     <Clock size={17} />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">2</span>
-                    <ChevronRight size={14} className="text-white/40 group-hover:translate-x-0.5 transition" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-2xl font-bold text-slate-100">2</span>
+                    <ChevronRight size={14} className="text-slate-500 group-hover:translate-x-0.5 transition" />
                   </div>
                 </div>
-                <p className="text-xs text-white/70 font-medium">In Progress</p>
+                <p className="text-xs text-slate-400 font-medium">In Progress</p>
               </div>
 
-              <div className="bg-white/12 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition cursor-pointer group shadow-lg">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="w-9 h-9 rounded-full bg-emerald-500/25 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              {/* Resolved */}
+              <div className={`rounded-2xl p-4 cursor-pointer group ${NEU_BTN_INTERACTIVE}`}>
+                <div className="flex justify-between items-start mb-2.5">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-emerald-400 ${NEU_INSET_SM}`}>
                     <CheckCircle2 size={17} />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">1</span>
-                    <ChevronRight size={14} className="text-white/40 group-hover:translate-x-0.5 transition" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-2xl font-bold text-slate-100">1</span>
+                    <ChevronRight size={14} className="text-slate-500 group-hover:translate-x-0.5 transition" />
                   </div>
                 </div>
-                <p className="text-xs text-white/70 font-medium">Resolved</p>
+                <p className="text-xs text-slate-400 font-medium">Resolved</p>
               </div>
 
-              <div className="bg-white/12 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition cursor-pointer group flex items-center gap-3 shadow-lg">
-                <div className="w-9 h-9 shrink-0 rounded-full bg-purple-500/25 border border-purple-400/40 flex items-center justify-center text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+              {/* View Analytics */}
+              <div className={`rounded-2xl p-4 cursor-pointer group flex items-center gap-3.5 ${NEU_BTN_INTERACTIVE}`}>
+                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-rose-400 ${NEU_INSET_SM}`}>
                   <BarChart3 size={17} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-white leading-snug">View</p>
-                  <p className="text-xs font-semibold text-white leading-snug">Analytics</p>
+                  <p className="text-xs font-semibold text-slate-200 leading-snug">View</p>
+                  <p className="text-xs font-semibold text-slate-400 leading-snug">Analytics</p>
                 </div>
               </div>
             </div>
 
+            {/* Neumorphic "Open the Notebook" CTA Button */}
             <button
               onClick={() => openNotebookWithCategory()}
-              className="group relative w-full rounded-2xl p-4 bg-gradient-to-r from-indigo-950/80 via-indigo-900/75 to-violet-600/80 border border-indigo-400/40 shadow-[0_10px_35px_rgba(99,102,241,0.35)] hover:shadow-[0_12px_45px_rgba(124,58,237,0.55)] transition-all duration-300 flex items-center justify-between cursor-pointer overflow-hidden mb-3"
+              className={`group relative w-full rounded-2xl p-4 flex items-center justify-between cursor-pointer mb-3 ${NEU_BTN_INTERACTIVE}`}
             >
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-indigo-200">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-rose-300 ${NEU_INSET_SM}`}>
                   <BookOpen size={20} />
                 </div>
                 <div className="text-left">
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-indigo-200/80 font-semibold">
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-rose-300/90 font-semibold">
                     Report a New Issue
                   </p>
-                  <p className="font-serif-display text-xl text-white font-medium">
+                  <p className="font-serif-display text-xl text-slate-100 font-medium">
                     Open the Notebook
                   </p>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-indigo-500/60 border border-indigo-300/60 flex items-center justify-center text-white shadow-[0_0_20px_rgba(129,140,248,0.8)] group-hover:scale-105 group-hover:translate-x-0.5 transition">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-rose-300 group-hover:translate-x-0.5 transition ${NEU_INSET_SM}`}>
                 <ArrowRight size={18} />
               </div>
             </button>
-            <p className="text-xs text-white/60 leading-relaxed pl-1">
+
+            <p className="text-xs text-slate-500 leading-relaxed pl-1">
               Every report brings us closer to a cleaner,<br />
-              safer and smarter city. <span className="inline-block w-6 h-[1px] bg-white/40 align-middle ml-1" />
+              safer and smarter city. <span className="inline-block w-6 h-[1px] bg-slate-600 align-middle ml-1" />
             </p>
           </div>
 
-          {/* COLUMN 2: 3D Notebook */}
+          {/* COLUMN 2: Neumorphic Pedestal & 3D Notebook */}
           <div className="col-span-4 flex items-center justify-center relative">
-            <div
-              onClick={() => openNotebookWithCategory()}
-              title="Click to open notebook"
-              className="group relative w-[300px] h-[410px] -rotate-6 hover:-rotate-2 hover:scale-105 transition-all duration-500 cursor-pointer"
-            >
-              <div className="absolute -inset-3 bg-black/75 rounded-3xl blur-2xl translate-y-6 -translate-x-3 transition-all group-hover:blur-3xl" />
-              <div className="absolute inset-y-2 -right-2.5 left-4 bg-gradient-to-r from-[#d8ccb8] via-[#f3ead8] to-[#cbbba0] rounded-r-2xl shadow-inner border-y border-r border-[#a6967c]" />
-              <div className="absolute -bottom-2 left-3 right-1 h-4 bg-gradient-to-b from-[#e8dec8] to-[#b8a98f] rounded-b-xl border-x border-b border-[#8c7d65]" />
-              <div 
-                className="relative w-full h-full rounded-r-2xl rounded-l-md bg-[#181715] border border-white/15 shadow-[inset_0_2px_15px_rgba(255,255,255,0.12),0_25px_50px_rgba(0,0,0,0.85)] flex flex-col justify-between p-8 overflow-hidden"
-                style={{ backgroundImage: `radial-gradient(rgba(255,255,255,0.06) 1px, transparent 0)`, backgroundSize: '6px 6px' }}
+            {/* Soft sunken circular neumorphic pedestal behind the book */}
+            <div className={`w-[360px] h-[360px] rounded-full flex items-center justify-center ${NEU_INSET}`}>
+              <div
+                onClick={() => openNotebookWithCategory()}
+                title="Click to open notebook"
+                className="group relative w-[290px] h-[400px] -rotate-6 hover:-rotate-2 hover:scale-105 transition-all duration-500 cursor-pointer"
               >
-                <div className="absolute top-0 bottom-0 left-0 w-7 bg-gradient-to-r from-black/80 via-white/5 to-black/60 border-r border-black/80" />
-                <div className="absolute -top-20 -left-20 w-72 h-72 bg-amber-100/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-100/15 transition" />
-                <div />
-                <div className="text-center pl-2 pr-4 my-auto">
-                  <h2 className="font-serif-display text-4xl font-semibold tracking-wide bg-gradient-to-b from-[#fff3d1] via-[#e5c17c] to-[#b3893e] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.9)] leading-tight">
-                    Call for<br />Resolve
-                  </h2>
-                  <div className="my-5 flex flex-col items-center justify-center opacity-85">
-                    <svg width="90" height="36" viewBox="0 0 100 40" fill="none" className="stroke-[#dab674]">
-                      <path d="M15 28 C 40 22, 60 18, 85 12" strokeWidth="1.5" strokeLinecap="round" />
-                      <path d="M35 23 C 30 14, 38 10, 42 20" strokeWidth="1.3" />
-                      <path d="M50 20 C 46 10, 55 8, 57 18" strokeWidth="1.3" />
-                      <path d="M65 16 C 62 8, 70 6, 72 14" strokeWidth="1.3" />
-                      <path d="M42 22 C 45 30, 53 28, 52 20" strokeWidth="1.3" />
-                      <path d="M58 18 C 62 26, 70 24, 68 16" strokeWidth="1.3" />
-                    </svg>
-                    <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#dab674]/70 to-transparent mt-2" />
+                {/* Neumorphic cast shadow under book */}
+                <div className="absolute -inset-2 bg-[#0d0e12] rounded-3xl blur-xl translate-y-5 -translate-x-2 transition-all" />
+                
+                {/* 3D Cream Paper Stack Edges */}
+                <div className="absolute inset-y-2 -right-2.5 left-4 bg-gradient-to-r from-[#d8ccb8] via-[#f3ead8] to-[#cbbba0] rounded-r-2xl shadow-inner border-y border-r border-[#a6967c]" />
+                <div className="absolute -bottom-2 left-3 right-1 h-4 bg-gradient-to-b from-[#e8dec8] to-[#b8a98f] rounded-b-xl border-x border-b border-[#8c7d65]" />
+                
+                {/* Matte Leather Cover */}
+                <div
+                  className="relative w-full h-full rounded-r-2xl rounded-l-md bg-[#16171b] border border-white/10 shadow-[12px_12px_25px_#0c0d10,-6px_-6px_16px_rgba(255,255,255,0.04)] flex flex-col justify-between p-8 overflow-hidden"
+                  style={{
+                    backgroundImage: `radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0)`,
+                    backgroundSize: '6px 6px',
+                  }}
+                >
+                  <div className="absolute top-0 bottom-0 left-0 w-7 bg-gradient-to-r from-black/80 via-white/5 to-black/60 border-r border-black/80" />
+                  <div />
+                  <div className="text-center pl-2 pr-4 my-auto">
+                    <h2 className="font-serif-display text-4xl font-semibold tracking-wide bg-gradient-to-b from-[#fff3d1] via-[#e5c17c] to-[#b3893e] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.9)] leading-tight">
+                      Call for<br />Resolve
+                    </h2>
+                    <div className="my-5 flex flex-col items-center justify-center opacity-85">
+                      <svg width="90" height="36" viewBox="0 0 100 40" fill="none" className="stroke-[#dab674]">
+                        <path d="M15 28 C 40 22, 60 18, 85 12" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M35 23 C 30 14, 38 10, 42 20" strokeWidth="1.3" />
+                        <path d="M50 20 C 46 10, 55 8, 57 18" strokeWidth="1.3" />
+                        <path d="M65 16 C 62 8, 70 6, 72 14" strokeWidth="1.3" />
+                        <path d="M42 22 C 45 30, 53 28, 52 20" strokeWidth="1.3" />
+                        <path d="M58 18 C 62 26, 70 24, 68 16" strokeWidth="1.3" />
+                      </svg>
+                      <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#dab674]/70 to-transparent mt-2" />
+                    </div>
                   </div>
+                  <div className="text-center pl-2 pr-4 pb-2">
+                    <p className="text-[10px] tracking-[0.24em] uppercase text-[#dab674]/90 font-semibold leading-relaxed">
+                      People Report.<br />Cities Improve.
+                    </p>
+                  </div>
+                  <div className="absolute top-0 bottom-0 right-5 w-5 bg-gradient-to-r from-[#0e0d0c] via-[#242220] to-[#0e0d0c] shadow-[0_0_12px_rgba(0,0,0,0.95)] border-x border-white/5" />
                 </div>
-                <div className="text-center pl-2 pr-4 pb-2">
-                  <p className="text-[10px] tracking-[0.24em] uppercase text-[#dab674]/90 font-semibold leading-relaxed">
-                    People Report.<br />Cities Improve.
-                  </p>
-                </div>
-                <div className="absolute top-0 bottom-0 right-5 w-5 bg-gradient-to-r from-[#0e0d0c] via-[#242220] to-[#0e0d0c] shadow-[0_0_12px_rgba(0,0,0,0.95)] border-x border-white/5" />
+                <div className="absolute -bottom-7 left-12 w-4 h-9 bg-[#121110] shadow-lg -rotate-6 rounded-b-sm" />
               </div>
-              <div className="absolute -bottom-7 left-12 w-4 h-9 bg-[#121110] shadow-lg -rotate-6 rounded-b-sm" />
             </div>
           </div>
 
-          {/* COLUMN 3: Recent Updates + City Map */}
-          {/* FIX: Set max-h-full and flex-1 so it respects the grid cell bounds */}
-          <div className="col-span-4 flex flex-col gap-4 max-h-full overflow-hidden justify-center relative">
+          {/* COLUMN 3: Neumorphic Recent Updates + City Map */}
+          <div className="col-span-4 flex flex-col gap-5 max-h-full overflow-hidden justify-center relative py-1 pr-1">
             
-            <div className="bg-black/25 backdrop-blur-2xl border border-white/15 rounded-[26px] p-5 shadow-2xl">
+            {/* Recent Updates Panel */}
+            <div className={`rounded-[28px] p-5 ${NEU_RAISED}`}>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-serif-display text-lg font-medium text-white">Recent Updates</h3>
-                <button className="text-xs text-white/70 hover:text-white underline underline-offset-4 cursor-pointer">
+                <h3 className="font-serif-display text-lg font-medium text-slate-100">Recent Updates</h3>
+                <button className="text-xs text-rose-300/80 hover:text-rose-300 underline underline-offset-4 cursor-pointer">
                   View all
                 </button>
               </div>
 
-              <div className="flex flex-col divide-y divide-white/10">
+              <div className="flex flex-col gap-3">
                 {[
-                  { title: 'Street light fixed', loc: 'Sector 12, Near Park', time: '2h ago', icon: Wrench, badge: 'bg-blue-500/25 border-blue-400/40 text-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.35)]' },
-                  { title: 'Garbage collection scheduled', loc: 'New Market Road', time: '5h ago', icon: Trash2, badge: 'bg-rose-500/25 border-rose-400/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.35)]' },
-                  { title: 'Pothole repair in progress', loc: 'Shivaji Nagar', time: '1d ago', icon: AlertTriangle, badge: 'bg-amber-500/25 border-amber-400/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]' },
-                  { title: 'Water leakage reported', loc: 'Arera Colony', time: '2d ago', icon: Droplets, badge: 'bg-purple-500/25 border-purple-400/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.35)]' },
+                  { title: 'Street light fixed', loc: 'Sector 12, Near Park', time: '2h ago', icon: Wrench, color: 'text-sky-400' },
+                  { title: 'Garbage collection scheduled', loc: 'New Market Road', time: '5h ago', icon: Trash2, color: 'text-rose-400' },
+                  { title: 'Pothole repair in progress', loc: 'Shivaji Nagar', time: '1d ago', icon: AlertTriangle, color: 'text-amber-400' },
+                  { title: 'Water leakage reported', loc: 'Arera Colony', time: '2d ago', icon: Droplets, color: 'text-teal-400' },
                 ].map((item, idx) => (
-                  <div key={idx} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                  <div key={idx} className={`p-2.5 rounded-2xl flex items-center justify-between gap-3 ${NEU_INSET_SM}`}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-full border flex items-center justify-center shrink-0 ${item.badge}`}>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${NEU_RAISED_SM} ${item.color}`}>
                         <item.icon size={15} />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-white leading-snug">{item.title}</p>
-                        <p className="text-xs text-white/55">{item.loc}</p>
+                        <p className="text-sm font-medium text-slate-200 leading-snug">{item.title}</p>
+                        <p className="text-xs text-slate-400">{item.loc}</p>
                       </div>
                     </div>
-                    <span className="text-xs text-white/50 shrink-0">{item.time}</span>
+                    <span className="text-xs text-slate-500 shrink-0 pr-1">{item.time}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-black/25 backdrop-blur-2xl border border-white/15 rounded-[26px] p-5 shadow-2xl flex flex-col shrink-0 h-[210px]">
+            {/* City Map Panel */}
+            <div className={`rounded-[28px] p-5 flex flex-col shrink-0 h-[210px] ${NEU_RAISED}`}>
               <div className="flex justify-between items-center mb-3">
-                <h3 className="font-serif-display text-lg font-medium text-white">City Map</h3>
-                <button className="text-xs text-white/70 hover:text-white underline underline-offset-4 cursor-pointer">
+                <h3 className="font-serif-display text-lg font-medium text-slate-100">City Map</h3>
+                <button className="text-xs text-rose-300/80 hover:text-rose-300 underline underline-offset-4 cursor-pointer">
                   View Map
                 </button>
               </div>
 
-              <div className="relative h-full w-full rounded-2xl overflow-hidden border border-white/15 bg-[#cbd5e1]">
-                <div 
-                  className="absolute inset-0 opacity-75"
+              {/* Recessed Dark Map Well */}
+              <div className={`relative h-full w-full rounded-2xl overflow-hidden ${NEU_INSET}`}>
+                <div
+                  className="absolute inset-0 opacity-35"
                   style={{
                     backgroundImage: `
-                      linear-gradient(35deg, transparent 42%, rgba(255,255,255,0.8) 43%, rgba(255,255,255,0.8) 46%, transparent 47%),
-                      linear-gradient(-25deg, transparent 58%, rgba(255,255,255,0.7) 59%, rgba(255,255,255,0.7) 62%, transparent 63%),
-                      linear-gradient(90deg, rgba(148,163,184,0.25) 1px, transparent 1px),
-                      linear-gradient(rgba(148,163,184,0.25) 1px, transparent 1px)
+                      linear-gradient(35deg, transparent 42%, rgba(148,163,184,0.25) 43%, rgba(148,163,184,0.25) 46%, transparent 47%),
+                      linear-gradient(-25deg, transparent 58%, rgba(148,163,184,0.2) 59%, rgba(148,163,184,0.2) 62%, transparent 63%),
+                      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+                      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)
                     `,
-                    backgroundSize: '100% 100%, 100% 100%, 24px 24px, 24px 24px'
+                    backgroundSize: '100% 100%, 100% 100%, 24px 24px, 24px 24px',
                   }}
                 />
-                <div className="absolute top-3 right-6 w-24 h-16 bg-emerald-600/20 rounded-full blur-md" />
-                <div className="absolute bottom-4 left-10 w-20 h-14 bg-emerald-600/20 rounded-full blur-md" />
-                <div className="absolute top-7 left-[54%] -translate-x-1/2 flex flex-col items-center">
-                  <div className="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow-[0_0_15px_rgba(37,99,235,0.9)] flex items-center justify-center">
+                {/* Neumorphic Pins */}
+                <div className="absolute top-6 left-[54%] -translate-x-1/2 flex flex-col items-center">
+                  <div className="w-6 h-6 rounded-full bg-sky-500 border-2 border-[#1c1e24] shadow-[0_0_12px_rgba(14,165,233,0.8)] flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-white" />
                   </div>
                 </div>
-                <div className="absolute top-16 left-[33%] flex flex-col items-center">
-                  <div className="w-5 h-5 rounded-full bg-rose-500 border-2 border-white shadow-[0_0_15px_rgba(244,63,94,0.9)]" />
+                <div className="absolute top-14 left-[33%] flex flex-col items-center">
+                  <div className="w-5 h-5 rounded-full bg-rose-500 border-2 border-[#1c1e24] shadow-[0_0_12px_rgba(244,63,94,0.8)]" />
                 </div>
                 <div className="absolute bottom-11 left-[46%] flex flex-col items-center">
-                  <div className="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-[0_0_15px_rgba(245,158,11,0.9)]" />
+                  <div className="w-4 h-4 rounded-full bg-amber-500 border-2 border-[#1c1e24] shadow-[0_0_12px_rgba(245,158,11,0.8)]" />
                 </div>
-                <div className="absolute top-20 right-[22%] flex flex-col items-center">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white shadow-[0_0_15px_rgba(16,185,129,0.9)]" />
+                <div className="absolute top-16 right-[22%] flex flex-col items-center">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#1c1e24] shadow-[0_0_12px_rgba(16,185,129,0.8)]" />
                 </div>
-                <div className="absolute bottom-2.5 left-2.5 bg-slate-900/75 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 flex items-center gap-2 text-xs text-white shadow-lg">
-                  <MapPin size={13} className="text-amber-300" />
+
+                {/* Location Pill */}
+                <div className={`absolute bottom-2.5 left-2.5 rounded-full px-3.5 py-1.5 flex items-center gap-2 text-xs text-slate-200 ${NEU_RAISED_SM}`}>
+                  <MapPin size={13} className="text-rose-400" />
                   <span>Sector 17, Bhopal, MP</span>
-                  <ArrowRight size={12} className="text-white/60" />
+                  <ArrowRight size={12} className="text-slate-400" />
                 </div>
-                <button className="absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full bg-white text-slate-900 shadow-lg flex items-center justify-center hover:scale-105 transition cursor-pointer">
+
+                <button className={`absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full text-rose-300 flex items-center justify-center hover:scale-105 transition cursor-pointer ${NEU_RAISED_SM}`}>
                   <MapPin size={15} />
                 </button>
               </div>
@@ -390,30 +428,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* BOTTOM BAR: Locked structurally (shrink-0, z-20) to prevent map overlap */}
-        <footer className="relative z-20 shrink-0 bg-black/25 backdrop-blur-2xl border border-white/15 rounded-[24px] px-6 py-3.5 flex items-center justify-between gap-4 shadow-2xl mt-auto">
+        {/* BOTTOM BAR: Extruded Neumorphic Categories Dock */}
+        <footer className={`relative z-20 shrink-0 rounded-[26px] px-6 py-4 flex items-center justify-between gap-5 mt-auto ${NEU_RAISED}`}>
           <div className="shrink-0 pr-2">
-            <p className="font-serif-display text-base font-medium text-white leading-tight">Popular</p>
-            <p className="font-serif-display text-base font-medium text-white leading-tight mb-1">Categories</p>
-            <button 
+            <p className="font-serif-display text-base font-medium text-slate-100 leading-tight">Popular</p>
+            <p className="font-serif-display text-base font-medium text-slate-100 leading-tight mb-1">Categories</p>
+            <button
               onClick={() => openNotebookWithCategory()}
-              className="text-xs text-white/65 hover:text-white flex items-center gap-1 cursor-pointer"
+              className="text-xs text-rose-300/80 hover:text-rose-300 flex items-center gap-1 cursor-pointer"
             >
               See all <ArrowRight size={12} />
             </button>
           </div>
 
-          <div className="flex-1 grid grid-cols-7 gap-3">
+          <div className="flex-1 grid grid-cols-7 gap-3.5">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => openNotebookWithCategory(cat.label)}
-                className="group bg-white/8 hover:bg-white/15 border border-white/12 hover:border-white/30 rounded-2xl py-2.5 px-2 flex flex-col items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-sm"
+                className={`group rounded-2xl py-2.5 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer ${NEU_BTN_INTERACTIVE}`}
               >
-                <div className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/85 group-hover:scale-110 group-hover:bg-amber-400/20 group-hover:border-amber-300/40 group-hover:text-amber-200 transition">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-slate-300 group-hover:text-rose-300 transition ${NEU_INSET_SM}`}>
                   <cat.icon size={17} />
                 </div>
-                <span className="text-[11px] text-white/80 font-medium text-center leading-tight line-clamp-1">
+                <span className="text-[11px] text-slate-300 group-hover:text-slate-100 font-medium text-center leading-tight line-clamp-1">
                   {cat.label}
                 </span>
               </button>
@@ -431,13 +469,13 @@ export default function App() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-6"
+            className="fixed inset-0 z-50 bg-[#121317]/85 flex items-center justify-center p-6"
           >
-            <div className="relative w-[920px] h-[600px] bg-[#1a1817] rounded-3xl p-4 shadow-[0_30px_90px_rgba(0,0,0,0.9)] border border-white/15 flex">
+            <div className={`relative w-[920px] h-[600px] rounded-3xl p-4 flex ${NEU_RAISED}`}>
               
               <button
                 onClick={() => setIsNotebookOpen(false)}
-                className="absolute -top-4 -right-4 z-30 w-10 h-10 rounded-full bg-neutral-900 border border-white/25 text-white/80 hover:text-white flex items-center justify-center shadow-xl cursor-pointer"
+                className={`absolute -top-4 -right-4 z-30 w-10 h-10 rounded-full text-slate-300 hover:text-rose-400 flex items-center justify-center cursor-pointer ${NEU_BTN_INTERACTIVE}`}
               >
                 <X size={18} />
               </button>
@@ -474,7 +512,7 @@ export default function App() {
                       ✓ Officially Resolved • Core Score 8.6
                     </div>
                     <div className="relative bg-white p-3 pb-7 shadow-xl rotate-2 border border-stone-200 w-64">
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-amber-100/70 backdrop-blur-xs -rotate-2 shadow-xs border border-amber-200/50" />
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-amber-100/70 -rotate-2 shadow-xs border border-amber-200/50" />
                       <img
                         src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=600&auto=format&fit=crop"
                         alt="Repaired Road"
@@ -530,9 +568,13 @@ export default function App() {
                                 onClick={() => setSelectedCategory(cat.label)}
                                 className="flex items-center gap-3.5 py-1.5 px-2 rounded-lg hover:bg-[#ebe0cc] transition text-left cursor-pointer"
                               >
-                                <div className={`w-5 h-5 rounded border flex items-center justify-center transition ${
-                                  selectedCategory === cat.label ? 'bg-[#231d19] border-[#231d19] text-white' : 'border-[#8c7d6b]'
-                                }`}>
+                                <div
+                                  className={`w-5 h-5 rounded border flex items-center justify-center transition ${
+                                    selectedCategory === cat.label
+                                      ? 'bg-[#231d19] border-[#231d19] text-white'
+                                      : 'border-[#8c7d6b]'
+                                  }`}
+                                >
                                   {selectedCategory === cat.label && <Check size={14} />}
                                 </div>
                                 <cat.icon size={18} className="text-[#4a3f36]" />
@@ -559,11 +601,11 @@ export default function App() {
                             />
                           </div>
                           <div className="flex-1 rounded-xl border border-[#b8a992] bg-[#e6dac3] relative overflow-hidden flex items-center justify-center">
-                            <div 
+                            <div
                               className="absolute inset-0 opacity-40"
                               style={{
                                 backgroundImage: `linear-gradient(#7a6f63 1px, transparent 1px), linear-gradient(90deg, #7a6f63 1px, transparent 1px)`,
-                                backgroundSize: '28px 28px'
+                                backgroundSize: '28px 28px',
                               }}
                             />
                             <div className="relative z-10 flex flex-col items-center">
@@ -629,7 +671,9 @@ export default function App() {
                             </div>
                           </div>
                           <div className="bg-[#ebe0cc] rounded-xl p-3 text-xs text-[#4a3f36] flex items-center justify-between">
-                            <span>AI Classifier Auto-Route: <strong>Municipal Roads Dept</strong></span>
+                            <span>
+                              AI Classifier Auto-Route: <strong>Municipal Roads Dept</strong>
+                            </span>
                             <span className="font-bold text-rose-700">★ Priority 9.2</span>
                           </div>
                         </div>
@@ -672,7 +716,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
